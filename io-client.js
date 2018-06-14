@@ -1,9 +1,7 @@
 import socketIo from 'socket.io-client';
 const jq = require('node-jq')
 
-let history = {};
-
-export const io = (monitorClient) => {
+export const io = (monitorClient, store) => {
 	const sessionClient = socketIo('http://127.0.0.1:7079', { path: '/io3'});
 
 	sessionClient.on('connect', function() {
@@ -13,11 +11,11 @@ export const io = (monitorClient) => {
 	monitorClient.on('history:fetch-state', (data) => {
 		// console.log(`fetching state for ${data.label}`, history[data.label]);
 		console.log(`fetching state for ${data.label}`);
-		monitorClient.emit('history:fetch-state', history[data.label]);
+		monitorClient.emit('history:fetch-state', store.history[data.label]);
 	})
 	monitorClient.on('history:clear', (data) => {
-		history = {};
-		console.log(`clearing history`, history);
+		store.history = {};
+		console.log(`clearing history`, store);
 	});
 
 	sessionClient.on('backend:state', (data) => {
@@ -35,9 +33,9 @@ export const io = (monitorClient) => {
 		// })
 		// monitorClient.emit('backend:state', {...data, action: formattedAction});
 
-		const label = `${data.timestamp};${data.action.type}`;
-		history[label] = data;
-		monitorClient.emit('backend:state', {labels: Object.keys(history), ...data});
+		const label = `${data.timestamp};[BE] ${data.action.type}`;
+		store.history[label] = data;
+		monitorClient.emit('backend:state', {labels: Object.keys(store.history), ...data});
 			
 	});
 };
