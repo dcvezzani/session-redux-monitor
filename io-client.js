@@ -2,7 +2,7 @@ import socketIo from 'socket.io-client';
 const jq = require('node-jq')
 
 export const io = (monitorClient, store) => {
-	const sessionClient = socketIo('http://127.0.0.1:7079', { path: '/io3'});
+	const sessionClient = socketIo('http://127.0.0.1:7079', { path: '/io'});
 
 	sessionClient.on('connect', function() {
 		 sessionClient.emit('room', 'redux-backend:monitor');
